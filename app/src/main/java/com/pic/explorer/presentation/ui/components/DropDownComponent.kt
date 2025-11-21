@@ -25,10 +25,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun AuthorDropDown(
-    authors: List<String?>,
-    selected: String?,
-    onSelected: (String?) -> Unit
+fun <T> DropDownCommon(
+    label: String,
+    items: List<T>,
+    selected: T?,
+    itemToText: (T) -> String = { it.toString() },
+    onSelected: (T?) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -40,9 +42,11 @@ fun AuthorDropDown(
             .shadow(5.dp, shape = RoundedCornerShape(8.dp))
             .background(Color.White, shape = RoundedCornerShape(8.dp))
             .clickable { expanded = true },
-        contentAlignment = Alignment.Center) {
+        contentAlignment = Alignment.Center
+    ) {
+
         Text(
-            text = selected ?: "All Authors",
+            text = selected?.let { itemToText(it) } ?: label,
             fontSize = 20.sp,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier
@@ -51,6 +55,7 @@ fun AuthorDropDown(
             textAlign = TextAlign.Center,
             color = Color.Black
         )
+
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
@@ -59,29 +64,31 @@ fun AuthorDropDown(
                 .padding(start = 20.dp, end = 20.dp)
                 .background(Color.White)
         ) {
-            DropdownMenuItem(
-                onClick = {
-                    onSelected(null)
-                    expanded = false
-                },
-                text = {
-                    Text(
-                        text = "All Authors",
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                })
-
-            authors.forEach { author ->
+            if (label.isNotEmpty()) {
                 DropdownMenuItem(
                     onClick = {
-                        onSelected(author)
+                        onSelected(null)
                         expanded = false
                     },
                     text = {
-                        if (author != null) {
+                        Text(
+                            text = "All Authors",
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    })
+            }
+
+            items.forEach { item ->
+                DropdownMenuItem(
+                    onClick = {
+                        onSelected(item)
+                        expanded = false
+                    },
+                    text = {
+                        if (item != null) {
                             Text(
-                                text = author,
+                                text = itemToText(item),
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier.fillMaxWidth()
                             )

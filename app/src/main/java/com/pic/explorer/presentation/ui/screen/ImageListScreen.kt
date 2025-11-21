@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.pic.explorer.R
-import com.pic.explorer.presentation.ui.components.AuthorDropDown
+import com.pic.explorer.presentation.ui.components.DropDownCommon
 import com.pic.explorer.presentation.ui.components.SingleImageCardComponent
 import com.pic.explorer.presentation.viewModels.ImageViewModel
 
@@ -68,9 +68,11 @@ fun ImageListScreen(viewModel: ImageViewModel = hiltViewModel()) {
                 }
             }
             else -> {
-                AuthorDropDown(
-                    authors = uiState.authors,
+                DropDownCommon (
+                    label = "All Authors",
+                    items = uiState.authors,
                     selected = uiState.selectedAuthor,
+                    itemToText = {it ?: "Unknown"},
                     onSelected = { viewModel.filterByAuthor(it) }
                 )
                 LazyVerticalGrid(
