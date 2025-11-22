@@ -14,6 +14,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CardElevation
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -48,7 +49,7 @@ fun SingleImageCardComponent(image: ImageModel) {
                 modifier = Modifier
                     .fillMaxSize()
                     .clip(RoundedCornerShape(16.dp)),
-                contentScale = ContentScale.Fit,
+                contentScale = ContentScale.FillBounds,
                 loading = placeholder {
                     Box(
                         modifier = Modifier
@@ -78,15 +79,20 @@ fun SingleImageCardComponent(image: ImageModel) {
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
                     .height(40.dp),
-                color = Color.Black
+                color = MaterialTheme.colorScheme.error
             ) {
-                image.author?.let {
-                    Text(
-                        text = it,
-                        color = Color.White,
-                        textAlign = TextAlign.Center
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    image.author?.let {
+                        Text(
+                            text = it,
+                            color = MaterialTheme.colorScheme.background,
+                            textAlign = TextAlign.Center
 
                         )
+                    }
                 }
             }
         }

@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
@@ -35,6 +36,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -59,6 +61,13 @@ import com.pic.explorer.presentation.viewModels.ImageViewModel
 @Composable
 fun ImageListScreen(viewModel: ImageViewModel = hiltViewModel()) {
     val uiState by viewModel.imageUiState.collectAsState()
+    val gridState = rememberLazyGridState()
+
+    LaunchedEffect(uiState.filteredImages) {
+        if (uiState.filteredImages.isNotEmpty()) {
+            gridState.animateScrollToItem(0)
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -83,7 +92,8 @@ fun ImageListScreen(viewModel: ImageViewModel = hiltViewModel()) {
 
                     Text(
                         text = "Pic Explorer",
-                        style = MaterialTheme.typography.titleLarge
+                        style = MaterialTheme.typography.titleLarge,
+                        color = Color.Black
                     )
                 }
             },
@@ -134,29 +144,28 @@ fun ImageListScreen(viewModel: ImageViewModel = hiltViewModel()) {
             }
 
             uiState.errorMessage != null -> {
-                if (!uiState.isOffline) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Image(
-                                painterResource(R.drawable.error),
-                                "error",
-                                modifier = Modifier.padding(bottom = 40.dp)
-                            )
-                            Text(
-                                text = uiState.errorMessage ?: "Something went wrong",
-                                color = Color.Red,
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Button(
-                                modifier = Modifier.padding(top = 20.dp),
-                                onClick = { viewModel.getAllImages() }
-                            ) {
-                                Text(text = "Reload")
-                            }
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Image(
+                            painterResource(R.drawable.error),
+                            "error",
+                            modifier = Modifier.padding(bottom = 40.dp)
+                        )
+                        Text(
+                            text = uiState.errorMessage ?: "Something went wrong",
+                            color = Color.Red,
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Button(
+                            modifier = Modifier.padding(top = 20.dp),
+                            onClick = { viewModel.getAllImages() }
+                        ) {
+                            Text(text = "Reload")
                         }
                     }
                 }
+
             }
 
             else -> {
@@ -206,6 +215,7 @@ fun ImageListScreen(viewModel: ImageViewModel = hiltViewModel()) {
                 }
 
                 LazyVerticalGrid(
+                    state = gridState,
                     columns = GridCells.Fixed(2),
                     modifier = Modifier
                         .fillMaxSize()
