@@ -27,7 +27,7 @@ The project follows **Clean Architecture**.
 
 ## Screenshots
 
-| ![Home](screenshots/home.png) | ![Offline](screenshots/offline.png) | ![Filter](screenshots/offline.png) | ![Offline_Filter](screenshots/offline.png) |
+| ![Home](screenshots/home.png) | ![Offline](screenshots/offline.png) | ![Filter](screenshots/filter.png) | ![Offline_Filter](screenshots/offline_filter.png) |
 
 
 ---
