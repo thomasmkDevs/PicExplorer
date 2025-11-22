@@ -1,6 +1,8 @@
 package com.pic.explorer.presentation.ui.screen
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -38,6 +41,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -89,6 +94,38 @@ fun ImageListScreen(viewModel: ImageViewModel = hiltViewModel()) {
             modifier = Modifier.padding(bottom = 20.dp)
         )
 
+        if (uiState.isOffline) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(40.dp)
+                    .background(Color.Red),
+                contentAlignment = Alignment.CenterStart
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceAround
+                ) {
+                    Text(
+                        text = "No Internet Connection. Showing cached data.",
+                        color = Color.White,
+                        textAlign = TextAlign.Center,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 14.sp,
+                        modifier = Modifier.padding(start = 20.dp)
+                    )
+                    Image(
+                        imageVector = Icons.Default.Refresh,
+                        contentDescription = "Refresh",
+                        modifier = Modifier
+                            .clickable { viewModel.getAllImages() },
+                        colorFilter = ColorFilter.tint(Color.White)
+                    )
+                }
+
+            }
+        }
+
         when {
             uiState.isLoading -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -97,30 +134,33 @@ fun ImageListScreen(viewModel: ImageViewModel = hiltViewModel()) {
             }
 
             uiState.errorMessage != null -> {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Image(
-                            painterResource(R.drawable.error),
-                            "error",
-                            modifier = Modifier.padding(bottom = 40.dp)
-                        )
-                        Text(
-                            text = uiState.errorMessage ?: "Something went wrong",
-                            color = Color.Red,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Button(
-                            modifier = Modifier.padding(top = 20.dp),
-                            onClick = { viewModel.getAllImages() }
-                        ) {
-                            Text(text = "Reload")
+                if (!uiState.isOffline) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Image(
+                                painterResource(R.drawable.error),
+                                "error",
+                                modifier = Modifier.padding(bottom = 40.dp)
+                            )
+                            Text(
+                                text = uiState.errorMessage ?: "Something went wrong",
+                                color = Color.Red,
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Button(
+                                modifier = Modifier.padding(top = 20.dp),
+                                onClick = { viewModel.getAllImages() }
+                            ) {
+                                Text(text = "Reload")
+                            }
                         }
                     }
                 }
             }
 
             else -> {
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()

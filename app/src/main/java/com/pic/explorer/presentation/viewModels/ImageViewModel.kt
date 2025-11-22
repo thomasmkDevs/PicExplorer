@@ -41,16 +41,26 @@ class ImageViewModel @Inject constructor(
                     _imageUiState.update { it.copy(isLoading = true, errorMessage = null) }
                 }
                 .catch { e ->
-                    _imageUiState.update {
-                        it.copy(
-                            isLoading = false,
-                            errorMessage = "Something went wrong"
-                        )
+                    when(e.message){
+                        "NO_INTERNET_CONNECTION" -> _imageUiState.update {
+                            it.copy(
+                                isLoading = false,
+                                errorMessage = "No Internet Connection",
+                                isOffline = true
+                            )
+                        }
+                        else -> _imageUiState.update {
+                            it.copy(
+                                isLoading = false,
+                                errorMessage = "Something went wrong: ${e.message}"
+                            )
+                        }
                     }
                 }
-                .collect { result ->
+                .collect { (result, isOffline) ->
                     val authors = result.map { it.author }.distinct()
-                    val filtered = if (selectedAuthor.isNullOrEmpty()) result else result.filter { it.author == selectedAuthor }
+                    val filtered =
+                        if (selectedAuthor.isNullOrEmpty()) result else result.filter { it.author == selectedAuthor }
                     _imageUiState.update {
                         it.copy(
                             isLoading = false,
@@ -58,7 +68,8 @@ class ImageViewModel @Inject constructor(
                             images = result,
                             authors = authors,
                             filteredImages = filtered,
-                            selectedAuthor = selectedAuthor
+                            selectedAuthor = selectedAuthor,
+                            isOffline = isOffline
                         )
                     }
                 }
@@ -77,9 +88,11 @@ class ImageViewModel @Inject constructor(
             SortType.ASCENDING -> {
                 list = list.sortedBy { it.author ?: "" }
             }
+
             SortType.DESCENDING -> {
                 list = list.sortedByDescending { it.author ?: "" }
             }
+
             SortType.NONE -> Unit
         }
 

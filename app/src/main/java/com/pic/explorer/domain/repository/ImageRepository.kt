@@ -5,6 +5,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface ImageRepository {
 
-    fun getAllImages(): Flow<List<ImageModel>>
+    fun getAllImages(): Flow<Pair<List<ImageModel>, Boolean>>
 
 }

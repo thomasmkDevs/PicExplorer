@@ -9,5 +9,6 @@ data class ImageUIState(
     val authors: List<String?> = emptyList(),
     val selectedAuthor: String? = null,
     val errorMessage: String? = null,
-    val selectedSort: SortType = SortType.ASCENDING
+    val selectedSort: SortType = SortType.ASCENDING,
+    val isOffline: Boolean = false
 )
