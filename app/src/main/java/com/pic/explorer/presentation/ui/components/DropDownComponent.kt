@@ -47,7 +47,7 @@ fun <T> DropDownCommon(
 
         Text(
             text = selected?.let { itemToText(it) } ?: label,
-            fontSize = 20.sp,
+            fontSize = 14.sp,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier
                 .fillMaxWidth()

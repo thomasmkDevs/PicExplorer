@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.pic.explorer.data.local.PreferencesManager
 import com.pic.explorer.domain.repository.ImageRepository
 import com.pic.explorer.presentation.uiModels.ImageUIState
+import com.pic.explorer.presentation.uiModels.SortType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -34,6 +35,7 @@ class ImageViewModel @Inject constructor(
 
             val selectedAuthor = preferencesManager.getSelectedAuthor()
 
+            println("selectedAuthor $selectedAuthor")
             imageRepository.getAllImages()
                 .onStart {
                     _imageUiState.update { it.copy(isLoading = true, errorMessage = null) }
@@ -63,19 +65,42 @@ class ImageViewModel @Inject constructor(
         }
     }
 
-    fun filterByAuthor(author: String?) {
+    fun allFilters() {
 
-        preferencesManager.saveSelectedAuthor(author)
+        var list = _imageUiState.value.images
 
-        if (author == null) {
-            _imageUiState.update {
-                it.copy(filteredImages = it.images, selectedAuthor = null)
-            }
-        }else{
-            _imageUiState.update {
-                it.copy(filteredImages = it.images.filter { it.author == author }, selectedAuthor = author)
-            }
+        _imageUiState.value.selectedAuthor?.let { author ->
+            list = list.filter { it.author == author }
         }
+
+        when (_imageUiState.value.selectedSort) {
+            SortType.ASCENDING -> {
+                list = list.sortedBy { it.author ?: "" }
+            }
+            SortType.DESCENDING -> {
+                list = list.sortedByDescending { it.author ?: "" }
+            }
+            SortType.NONE -> Unit
+        }
+
+        _imageUiState.update {
+            it.copy(filteredImages = list)
+        }
+    }
+
+    fun filterByAuthor(author: String?) {
+        preferencesManager.saveSelectedAuthor(author)
+        _imageUiState.update {
+            it.copy(selectedAuthor = author)
+        }
+        allFilters()
+    }
+
+    fun sortImages(sortType: SortType) {
+        _imageUiState.update {
+            it.copy(selectedSort = sortType)
+        }
+        allFilters()
     }
 
 }
